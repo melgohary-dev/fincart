@@ -1,0 +1,75 @@
+{
+  "common": {
+    "appTitle": "Fincart Courier Rate Comparison",
+    "loading": "Loading...",
+    "retry": "Retry",
+    "search": "Search Rates",
+    "next": "Next",
+    "back": "Back",
+    "cancel": "Cancel",
+    "error": "An error occurred",
+    "noResults": "No results found",
+    "language": "Language",
+    "english": "English",
+    "arabic": "Arabic"
+  },
+  "form": {
+    "origin": {
+      "title": "Origin Details",
+      "label": "Origin Country",
+      "placeholder": "Select origin country",
+      "helperText": "Where is the package shipping from?"
+    },
+    "destination": {
+      "title": "Destination Details",
+      "label": "Destination Country",
+      "placeholder": "Select destination country",
+      "helperText": "Where is the package shipping to?",
+      "sameAsOrigin": "Destination must be different from origin"
+    },
+    "package": {
+      "title": "Package Dimensions",
+      "weight": {
+        "label": "Weight (kg)",
+        "placeholder": "Enter weight in kg",
+        "error": "Weight must be greater than 0",
+        "required": "Weight is required"
+      },
+      "volume": {
+        "label": "Volume (m³) – optional",
+        "placeholder": "Enter volume in m³",
+        "error": "Volume must be greater than 0 if provided"
+      }
+    },
+    "validation": {
+      "originRequired": "Please select an origin country",
+      "destinationRequired": "Please select a destination country",
+      "sameCountry": "Origin and destination must be different"
+    }
+  },
+  "courier": {
+    "title": "Available Couriers",
+    "cheapest": "Cheapest",
+    "fastest": "Fastest",
+    "price": "Price",
+    "tax": "Tax",
+    "total": "Total",
+    "basePrice": "Base Price",
+    "deliveryDays": "Delivery Days",
+    "daysRange": "{{min}}-{{max}} business days",
+    "noCouriers": "No couriers available for this route",
+    "noCouriersDesc": "Try a different origin or destination",
+    "fetchError": "Unable to fetch rates. Please try again.",
+    "fetchErrorDesc": "This could be due to a network issue or the courier service is temporarily unavailable."
+  },
+  "sidebar": {
+    "title": "Shipment Summary",
+    "origin": "Origin",
+    "destination": "Destination",
+    "weight": "Weight",
+    "volume": "Volume",
+    "notSpecified": "Not specified",
+    "noSelection": "No selection yet",
+    "startSearch": "Fill in the details and search for rates"
+  }
+}
