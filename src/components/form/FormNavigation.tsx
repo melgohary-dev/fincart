@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 interface FormNavigationProps {
   step: number;
   totalSteps: number;
-  isValid: boolean;
+  canNext: boolean;
   onNext: () => void;
   onBack: () => void;
   onSearch: () => void;
@@ -14,7 +14,7 @@ interface FormNavigationProps {
 export default function FormNavigation({
   step,
   totalSteps,
-  isValid,
+  canNext,
   onNext,
   onBack,
   onSearch,
@@ -34,11 +34,11 @@ export default function FormNavigation({
       </Button>
 
       {isLastStep ? (
-        <Button variant="contained" color="primary" onClick={onSearch} disabled={!isValid}>
+        <Button variant="contained" color="primary" onClick={onSearch} disabled={!canNext}>
           {t('common.search')}
         </Button>
       ) : (
-        <Button variant="contained" onClick={onNext} disabled={!isValid}>
+        <Button variant="contained" onClick={onNext} disabled={!canNext}>
           {t('common.next')}
         </Button>
       )}

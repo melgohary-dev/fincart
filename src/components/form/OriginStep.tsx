@@ -11,7 +11,7 @@ import type { Control, FieldErrors } from 'react-hook-form';
 import type { QuoteFormData } from '@/types';
 
 interface OriginStepProps {
-  control: Control<QuoteFormData>;
+  control: Control<QuoteFormData, any>;
   errors: FieldErrors<QuoteFormData>;
 }
 

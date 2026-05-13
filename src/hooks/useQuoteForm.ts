@@ -1,19 +1,27 @@
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { COUNTRY_CODES } from '@/utils/countryCodes';
 import { useQuoteStore } from '@/store/quoteStore';
-import type { QuoteFormData } from '@/types';
+import type { CountryCode, QuoteFormData } from '@/types';
+
+const countryCodeSet = new Set<CountryCode>(COUNTRY_CODES);
 
 const quoteSchema = z
   .object({
-    origin: z.string().refine((val) => val === '' || COUNTRY_CODES.includes(val as never), {
-      message: 'Please select an origin country',
-    }),
-    destination: z.string().refine((val) => val === '' || COUNTRY_CODES.includes(val as never), {
-      message: 'Please select a destination country',
-    }),
+    origin: z
+      .string()
+      .min(1, 'Please select an origin country')
+      .refine((val): val is CountryCode => countryCodeSet.has(val as CountryCode), {
+        message: 'Please select a valid origin country',
+      }),
+    destination: z
+      .string()
+      .min(1, 'Please select a destination country')
+      .refine((val): val is CountryCode => countryCodeSet.has(val as CountryCode), {
+        message: 'Please select a valid destination country',
+      }),
     weight: z.union([z.number().positive('Weight must be greater than 0'), z.literal('')]),
     volume: z.union([z.number().positive('Volume must be greater than 0'), z.literal('')]),
   })
@@ -37,9 +45,10 @@ export function useQuoteForm() {
   const {
     control,
     handleSubmit,
-    formState: { errors, isValid },
+    formState: { errors },
     trigger,
     reset,
+    getValues,
   } = useForm<QuoteFormData>({
     resolver: zodResolver(quoteSchema),
     mode: 'onChange',
@@ -53,6 +62,8 @@ export function useQuoteForm() {
 
   const watchedOrigin = useWatch({ control, name: 'origin' });
   const watchedDestination = useWatch({ control, name: 'destination' });
+  const watchedWeight = useWatch({ control, name: 'weight' });
+  const watchedVolume = useWatch({ control, name: 'volume' });
 
   useEffect(() => {
     setOrigin(watchedOrigin);
@@ -62,12 +73,29 @@ export function useQuoteForm() {
     setDestination(watchedDestination);
   }, [watchedDestination, setDestination]);
 
-  const watchedValues = useWatch({ control });
+  useEffect(() => {
+    if (typeof watchedWeight === 'number') setWeight(watchedWeight);
+  }, [watchedWeight, setWeight]);
 
   useEffect(() => {
-    if (typeof watchedValues.weight === 'number') setWeight(watchedValues.weight);
-    if (typeof watchedValues.volume === 'number') setVolume(watchedValues.volume);
-  }, [watchedValues.weight, watchedValues.volume, setWeight, setVolume]);
+    if (typeof watchedVolume === 'number') setVolume(watchedVolume);
+  }, [watchedVolume, setVolume]);
+
+  const canNext = useMemo(() => {
+    if (step === 0) {
+      const origin = getValues('origin');
+      return !!origin && !errors.origin;
+    }
+    if (step === 1) {
+      const destination = getValues('destination');
+      return !!destination && !errors.destination;
+    }
+    if (step === 2) {
+      const weight = getValues('weight');
+      return weight !== '' && !errors.weight;
+    }
+    return false;
+  }, [step, errors, getValues]);
 
   const handleNext = useCallback(async () => {
     let fieldsToValidate: (keyof QuoteFormData)[];
@@ -92,13 +120,11 @@ export function useQuoteForm() {
   return {
     control,
     errors,
-    isValid,
+    canNext,
     step,
-    setStep,
     handleNext,
     handleBack,
     handleSubmit,
-    trigger,
     resetForm,
     totalSteps: 3,
   };

@@ -19,7 +19,7 @@ const CourierGrid = lazy(() => import('@/components/courier/CourierGrid'));
 
 export default function App() {
   const { t, i18n } = useTranslation();
-  const { control, errors, isValid, step, handleNext, handleBack, handleSubmit, totalSteps } =
+  const { control, errors, canNext, step, handleNext, handleBack, handleSubmit, totalSteps } =
     useQuoteForm();
 
   const { refetch, canSearch } = useCourierSearch();
@@ -70,7 +70,7 @@ export default function App() {
               <FormNavigation
                 step={step}
                 totalSteps={totalSteps}
-                isValid={isValid}
+                canNext={canNext}
                 onNext={handleNext}
                 onBack={handleBack}
                 onSearch={handleSearch}
