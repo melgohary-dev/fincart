@@ -2,35 +2,49 @@ import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { COUNTRY_CODES } from '@/utils/countryCodes';
 import { useQuoteStore } from '@/store/quoteStore';
-import type { CountryCode, QuoteFormData } from '@/types';
+import type { QuoteFormData } from '@/types';
+import { CountryCode, FormStep } from '@/types';
 
-const countryCodeSet = new Set<CountryCode>(COUNTRY_CODES);
+/**
+ * Quote calculation form with multi-step wizard, Zod validation, and i18n error messages.
+ *
+ * Creates a reactive Zod schema on every language change so that validation
+ * messages respect the current locale. The resolver is swapped transparently
+ * because react-hook-form v7+ picks up resolver changes and re-validates.
+ */
+export function createQuoteSchema(t: (key: string) => string) {
+  const countryCodeSet = new Set<string>(COUNTRY_CODES);
 
-const quoteSchema = z
-  .object({
-    origin: z
-      .string()
-      .min(1, 'Please select an origin country')
-      .refine((val): val is CountryCode => countryCodeSet.has(val as CountryCode), {
-        message: 'Please select a valid origin country',
-      }),
-    destination: z
-      .string()
-      .min(1, 'Please select a destination country')
-      .refine((val): val is CountryCode => countryCodeSet.has(val as CountryCode), {
-        message: 'Please select a valid destination country',
-      }),
-    weight: z.union([z.number().positive('Weight must be greater than 0'), z.literal('')]),
-    volume: z.union([z.number().positive('Volume must be greater than 0'), z.literal('')]),
-  })
-  .refine((data) => !data.origin || !data.destination || data.origin !== data.destination, {
-    message: 'Origin and destination must be different',
-    path: ['destination'],
-  });
+  return z
+    .object({
+      origin: z
+        .string()
+        .min(1, t('form.validation.originRequired'))
+        .refine((val): val is CountryCode => countryCodeSet.has(val as CountryCode), {
+          message: t('form.validation.originRequired'),
+        }),
+      destination: z
+        .string()
+        .min(1, t('form.validation.destinationRequired'))
+        .refine((val): val is CountryCode => countryCodeSet.has(val as CountryCode), {
+          message: t('form.validation.destinationRequired'),
+        }),
+      weight: z.union([z.number().positive(t('form.package.weight.error')), z.null()]),
+      volume: z.union([z.number().positive(t('form.package.volume.error')), z.null()]),
+    })
+    .refine((data) => !data.origin || !data.destination || data.origin !== data.destination, {
+      message: t('form.validation.sameCountry'),
+      path: ['destination'],
+    });
+}
+
+const TOTAL_STEPS = Object.keys(FormStep).length;
 
 export function useQuoteForm() {
+  const { t } = useTranslation();
   const storeOrigin = useQuoteStore((s) => s.origin);
   const storeDestination = useQuoteStore((s) => s.destination);
   const storeWeight = useQuoteStore((s) => s.weight);
@@ -40,7 +54,9 @@ export function useQuoteForm() {
   const setWeight = useQuoteStore((s) => s.setWeight);
   const setVolume = useQuoteStore((s) => s.setVolume);
 
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState<FormStep>(FormStep.Origin);
+
+  const quoteSchema = useMemo(() => createQuoteSchema(t), [t]);
 
   const {
     control,
@@ -48,7 +64,6 @@ export function useQuoteForm() {
     formState: { errors },
     trigger,
     reset,
-    getValues,
   } = useForm<QuoteFormData>({
     resolver: zodResolver(quoteSchema),
     mode: 'onChange',
@@ -82,39 +97,36 @@ export function useQuoteForm() {
   }, [watchedVolume, setVolume]);
 
   const canNext = useMemo(() => {
-    if (step === 0) {
-      const origin = getValues('origin');
-      return !!origin && !errors.origin;
+    if (step === FormStep.Origin) {
+      return !!watchedOrigin;
     }
-    if (step === 1) {
-      const destination = getValues('destination');
-      return !!destination && !errors.destination;
+    if (step === FormStep.Destination) {
+      return !!watchedDestination && watchedOrigin !== watchedDestination;
     }
-    if (step === 2) {
-      const weight = getValues('weight');
-      return weight !== '' && !errors.weight;
+    if (step === FormStep.Package) {
+      return watchedWeight !== null && watchedWeight > 0;
     }
     return false;
-  }, [step, errors, getValues]);
+  }, [step, watchedOrigin, watchedDestination, watchedWeight]);
 
   const handleNext = useCallback(async () => {
     let fieldsToValidate: (keyof QuoteFormData)[];
 
-    if (step === 0) fieldsToValidate = ['origin'];
-    else if (step === 1) fieldsToValidate = ['destination'];
+    if (step === FormStep.Origin) fieldsToValidate = ['origin'];
+    else if (step === FormStep.Destination) fieldsToValidate = ['destination'];
     else return;
 
     const valid = await trigger(fieldsToValidate);
-    if (valid) setStep((prev) => prev + 1);
+    if (valid) setStep((prev) => (prev + 1) as FormStep);
   }, [step, trigger]);
 
   const handleBack = useCallback(() => {
-    setStep((prev) => Math.max(0, prev - 1));
+    setStep((prev) => Math.max(FormStep.Origin, prev - 1) as FormStep);
   }, []);
 
   const resetForm = useCallback(() => {
     reset();
-    setStep(0);
+    setStep(FormStep.Origin);
   }, [reset]);
 
   return {
@@ -126,6 +138,6 @@ export function useQuoteForm() {
     handleBack,
     handleSubmit,
     resetForm,
-    totalSteps: 3,
+    totalSteps: TOTAL_STEPS,
   };
 }

@@ -4,6 +4,12 @@ import Button from '@mui/material/Button';
 import Error from '@mui/icons-material/Error';
 import { useTranslation } from 'react-i18next';
 
+/**
+ * Error state displayed when the courier API call fails.
+ *
+ * Includes a retry button that re-triggers the search.  The `role="alert"`
+ * ensures assistive technology announces the error immediately.
+ */
 interface ErrorStateProps {
   onRetry: () => void;
 }

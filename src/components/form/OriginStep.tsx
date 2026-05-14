@@ -4,19 +4,28 @@ import InputLabel from '@mui/material/InputLabel';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
+import FlightTakeoff from '@mui/icons-material/FlightTakeoff';
 import { Controller } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { COUNTRIES } from '@/utils/countryCodes';
+import { COUNTRIES, getCountryName } from '@/utils/countryCodes';
 import type { Control, FieldErrors } from 'react-hook-form';
 import type { QuoteFormData } from '@/types';
 
+/**
+ * Multi-step wizard – Origin country selector.
+ *
+ * Renders a labelled `<Select>` (React Hook Form controlled) with an
+ * always-visible FlightTakeoff icon. The icon dims to `action` when no
+ * country is selected and switches to `primary` once a value is picked.
+ */
 interface OriginStepProps {
   control: Control<QuoteFormData, any>;
   errors: FieldErrors<QuoteFormData>;
 }
 
 export default function OriginStep({ control, errors }: OriginStepProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   return (
     <>
@@ -39,13 +48,25 @@ export default function OriginStep({ control, errors }: OriginStepProps) {
               label={t('form.origin.label')}
               value={field.value || ''}
               onChange={(e) => field.onChange(e.target.value)}
+              renderValue={(selected) => (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <FlightTakeoff fontSize="small" color={selected ? 'primary' : 'disabled'} />
+                  {selected ? (
+                    getCountryName(selected, i18n.language)
+                  ) : (
+                    <Typography variant="body2" color="text.disabled">
+                      {t('form.origin.placeholder')}
+                    </Typography>
+                  )}
+                </Box>
+              )}
             >
               <MenuItem value="" disabled>
                 {t('form.origin.placeholder')}
               </MenuItem>
               {COUNTRIES.map((c) => (
                 <MenuItem key={c.code} value={c.code}>
-                  {c.name}
+                  {getCountryName(c.code, i18n.language)}
                 </MenuItem>
               ))}
             </Select>

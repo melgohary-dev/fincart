@@ -11,9 +11,17 @@
     "noResults": "No results found",
     "language": "Language",
     "english": "English",
-    "arabic": "Arabic"
+    "arabic": "Arabic",
+    "darkMode": "Dark Mode",
+    "lightMode": "Light Mode"
   },
   "form": {
+    "steps": {
+      "label": "Step {{current}} of {{total}}",
+      "origin": "Origin",
+      "destination": "Destination",
+      "package": "Package"
+    },
     "origin": {
       "title": "Origin Details",
       "label": "Origin Country",
@@ -54,6 +62,8 @@
     "price": "Price",
     "tax": "Tax",
     "total": "Total",
+    "ratePerKg": "Rate",
+    "shippingCost": "Shipping ({{weight}} kg)",
     "basePrice": "Base Price",
     "deliveryDays": "Delivery Days",
     "daysRange": "{{min}}-{{max}} business days",

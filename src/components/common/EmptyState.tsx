@@ -3,6 +3,12 @@ import Typography from '@mui/material/Typography';
 import SearchOff from '@mui/icons-material/SearchOff';
 import { useTranslation } from 'react-i18next';
 
+/**
+ * Empty state shown when no couriers match the selected route.
+ *
+ * Also serves as the default placeholder before any search is
+ * performed (the text is visible but unobtrusive).
+ */
 export default function EmptyState() {
   const { t } = useTranslation();
 

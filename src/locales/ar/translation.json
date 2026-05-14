@@ -11,9 +11,17 @@
     "noResults": "لا توجد نتائج",
     "language": "اللغة",
     "english": "الإنجليزية",
-    "arabic": "العربية"
+    "arabic": "العربية",
+    "darkMode": "الوضع الداكن",
+    "lightMode": "الوضع الفاتح"
   },
   "form": {
+    "steps": {
+      "label": "الخطوة {{current}} من {{total}}",
+      "origin": "بلد المنشأ",
+      "destination": "بلد الوجهة",
+      "package": "أبعاد الطرد"
+    },
     "origin": {
       "title": "بلد المنشأ",
       "label": "بلد المنشأ",
@@ -54,6 +62,8 @@
     "price": "السعر",
     "tax": "الضريبة",
     "total": "الإجمالي",
+    "ratePerKg": "سعر الكيلو",
+    "shippingCost": "الشحن ({{weight}} كجم)",
     "basePrice": "السعر الأساسي",
     "deliveryDays": "أيام التوصيل",
     "daysRange": "{{min}}-{{max}} يوم عمل",

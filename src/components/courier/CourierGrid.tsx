@@ -4,14 +4,28 @@ import Box from '@mui/material/Box';
 import { useTranslation } from 'react-i18next';
 import { useCourierSearch } from '@/hooks/useCourierSearch';
 import { enrichCouriersWithMeta } from '@/utils/pricingHelpers';
+import { useQuoteStore } from '@/store/quoteStore';
 import CourierCard from './CourierCard';
 import LoadingSkeleton from '@/components/common/LoadingSkeleton';
 import ErrorState from '@/components/common/ErrorState';
 import EmptyState from '@/components/common/EmptyState';
+import { BREAKPOINTS } from '@/types';
 
+/**
+ * Courier results grid.
+ *
+ * Handles all four states of the search lifecycle:
+ *   1. Loading / fetching      → `<LoadingSkeleton />`
+ *   2. Error                   → `<ErrorState />` with retry
+ *   3. Empty (no couriers)     → `<EmptyState />`
+ *   4. Results                 → responsive grid of `<CourierCard />`
+ */
 export default function CourierGrid() {
   const { t } = useTranslation();
-  const { data, isLoading, error, refetch, isFetching } = useCourierSearch();
+  const weight = useQuoteStore((s) => s.weight);
+  const { data, isLoading, error, refetch, isFetching, canSearch } = useCourierSearch();
+
+  if (!canSearch) return null;
 
   if (isLoading || isFetching) {
     return (
@@ -40,7 +54,8 @@ export default function CourierGrid() {
     );
   }
 
-  const couriers = enrichCouriersWithMeta(data);
+  const safeWeight = weight ?? 1;
+  const couriers = enrichCouriersWithMeta(data, safeWeight);
 
   return (
     <Box sx={{ mt: 4 }}>
@@ -49,8 +64,8 @@ export default function CourierGrid() {
       </Typography>
       <Grid container spacing={3}>
         {couriers.map((courier) => (
-          <Grid key={courier.id} size={{ xs: 12, sm: 6, md: 4 }}>
-            <CourierCard courier={courier} />
+          <Grid key={courier.id} size={BREAKPOINTS.cardGrid}>
+            <CourierCard courier={courier} weightKg={safeWeight} />
           </Grid>
         ))}
       </Grid>
