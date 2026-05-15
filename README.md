@@ -1,7 +1,6 @@
 # Fincart – Courier Rate Comparison
 
-**Live**: [fincart.vercel.app](https://fincart.vercel.app)  
-**Storybook**: [fincart-storybook.vercel.app](https://fincart-storybook.vercel.app)  
+**Live**: [fincart-z7io.vercel.app](https://fincart-z7io.vercel.app/)  
 **AI Disclosure**: [`PROMPTS.md`](./PROMPTS.md)
 
 Compare international courier shipping rates side-by-side. Built for emerging markets with slow 3G in mind.
